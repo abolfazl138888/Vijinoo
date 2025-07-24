@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فروشگاه ویجی‌نو</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes cosmicGlow {
+      0% { box-shadow: 0 0 8px #ff3e3e, 0 0 16px #ff6b6b; }
+      50% { box-shadow: 0 0 16px #ff6b6b, 0 0 32px #1e3a8a; }
+      100% { box-shadow: 0 0 8px #ff3e3e, 0 0 16px #ff6b6b; }
+    }
+    @keyframes cosmicSlide {
+      0% { opacity: 0; transform: translateX(20px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes chatPulse {
+      0% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.95; }
+    }
+    .animate-cosmic-slide {
+      animation: cosmicSlide 0.8s ease-out;
+    }
+    .product:hover {
+      transform: translateY(-10px) scale(1.03);
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      animation: cosmicGlow 1.2s infinite;
+    }
+    .btn-cosmic:hover {
+      animation: cosmicGlow 1.2s infinite;
+    }
+    .header-bg {
+      position: relative;
+      overflow: hidden;
+      height: 500px;
+      background: linear-gradient(135deg, #1e3a8a, #4b0082);
+    }
+    .header-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0.5;
+    }
+    .footer-bg {
+      background: linear-gradient(135deg, #ff3e3e, #1e3a8a);
+    }
+    .search-bar, .category-filter, .sort-filter {
+      transition: all 0.3s ease-in-out;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(12px);
+    }
+    .search-bar:focus, .category-filter:focus, .sort-filter:focus {
+      box-shadow: 0 0 12px rgba(255, 107, 107, 0.6);
+    }
+    .slider-container {
+      overflow: hidden;
+      position: relative;
+      perspective: 800px;
+    }
+    .slider {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
+    }
+    .slider-item {
+      flex: 0 0 100%;
+      text-align: center;
+      transform: rotateY(8deg);
+      transition: transform 0.6s ease-in-out;
+    }
+    .slider-item.active {
+      transform: rotateY(0deg);
+    }
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3a8a, #2a2a3e);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.6s ease-out;
+    }
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #ff3e3e;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 0.5s linear infinite;
+    }
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #ff6b6b, #1e3a8a);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      z-index: 1000;
+      text-align: center;
+      max-width: 400px;
+      animation: cosmicSlide 0.7s ease-out;
+    }
+    .popup.hidden {
+      display: none;
+    }
+    .dark-mode {
+      background: linear-gradient(to-br, #1e1e2e, #2a2a3e);
+      color: #e5e7eb;
+    }
+    .dark-mode .header-bg, .dark-mode .footer-bg {
+      background: linear-gradient(135deg, #4b0082, #1e1e2e);
+    }
+    .dark-mode .product {
+      background: linear-gradient(to-br, #2a2a3e, #4b0082);
+    }
+    .dark-mode .bg-white {
+      background: #2a2a3e;
+    }
+    .dark-mode .bg-gray-50 {
+      background: #1e1e2e;
+    }
+    .dark-mode .text-gray-900 {
+      color: #e5e7eb;
+    }
+    .dark-mode .text-gray-600 {
+      color: #d1d5db;
+    }
+    .cart-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #ff6b6b, #1e3a8a);
+      color: white;
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      z-index: 1000;
+      text-align: center;
+      max-width: 320px;
+      animation: cosmicSlide 0.6s ease-out;
+      display: none;
+    }
+    .chatbot {
+      position: fixed;
+      bottom: 60px;
+      right: 15px;
+      background: linear-gradient(135deg, #ff6b6b, #1e3a8a);
+      color: white;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      z-index: 1000;
+      max-width: 300px;
+      animation: chatPulse 1.6s ease-in-out infinite;
+    }
+    .chatbot.hidden {
+      display: none;
+    }
+    .chatbot-messages {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 6px;
+      padding: 6px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 6px;
+    }
+    .chatbot-message {
+      margin: 3px 0;
+      padding: 5px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.3);
+    }
+    .chatbot-message.user {
+      background: rgba(255,107,107,0.7);
+      text-align: right;
+    }
+    .rating {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 6px;
+    }
+    .rating i {
+      cursor: pointer;
+      color: #ccc;
+    }
+    .rating i.fas {
+      color: #ff3e3e;
+    }
+    .compare-button {
+      background: linear-gradient(135deg, #9333ea, #4b0082);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 10px;
+      margin-top: 6px;
+      display: inline-block;
+      transition: all 0.3s ease-in-out;
+    }
+    .compare-button:hover {
+      animation: cosmicGlow 1.2s infinite;
+    }
+    .compare-table {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .compare-table div {
+      background: linear-gradient(to-br, #ffffff, #f5f5f5);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .dark-mode .compare-table div {
+      background: linear-gradient(to-br, #2a2a3e, #4b0082);
+    }
+  </style>
+</head>
+<body class="font-sans">
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader"></div>
+    <p class="text-white text-lg mt-2">ویجی‌نو در حال ورود به مدار...</p>
+  </div>
+  <div class="popup" id="welcomePopup">
+    <h2 class="text-xl font-bold">خوش اومدی به ویجی‌نو! 🎉</h2>
+    <p class="mt-2 text-sm">بهترین کتاب‌های روانشناسی و علمی رو با تخفیفای خفن کشف کن!</p>
+    <button onclick="closePopup()" class="mt-3 bg-red-600 text-white py-1 px-5 rounded-full hover:bg-red-700 btn-cosmic">شروع خرید!</button>
+  </div>
+  <div class="cart-popup" id="cartPopup">
+    <h3 class="text-lg font-bold">سبد خرید</h3>
+    <div id="cartItems"></div>
+    <p class="mt-2">جمع کل: <span id="cartTotal">0</span> تومان</p>
+    <button onclick="closeCart()" class="mt-2 bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">بستن</button>
+    <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-green-600 text-white py-1 px-4 rounded-full hover:bg-green-700 btn-cosmic">سفارش از واتساپ</a>
+  </div>
+  <div class="chatbot hidden" id="chatbot">
+    <h3 class="text-base font-bold">چت‌بات ویجی‌نو 🚀</h3>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="chatbot-message">سلام! دنبال چه کتابی هستی؟ ژانر (روانشناسی، علمی، انگیزشی)، قیمت، یا موضوع خاص بگو تا برات پیدا کنم!</div>
+    </div>
+    <input type="text" id="chatbotInput" placeholder="پیامت رو بنویس..." class="w-full p-1 mt-1 rounded-full text-right text-gray-800">
+    <button onclick="sendChatbotMessage()" class="mt-1 bg-red-600 text-white py-1 px-3 rounded-full hover:bg-red-700 btn-cosmic">ارسال</button>
+    <button onclick="toggleChatbot()" class="absolute top-1 left-1 text-white"><i class="fas fa-times"></i></button>
+  </div>
+  <button onclick="toggleChatbot()" class="fixed bottom-15 right-15 bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 btn-cosmic"><i class="fas fa-robot"></i></button>
+
+  <header class="header-bg text-white py-8 relative">
+    <video autoplay muted loop class="header-video">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-starry-night-sky-4328-large.mp4" type="video/mp4">
+    </video>
+    <div class="container mx-auto text-center relative z-10">
+      <button id="themeToggle" class="absolute top-3 left-3 bg-yellow-400 text-gray-900 p-2 rounded-full hover:bg-yellow-500">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button id="langToggle" class="absolute top-3 left-12 bg-yellow-400 text-gray-900 p-2 rounded-full hover:bg-yellow-500">
+        <i class="fas fa-globe"></i>
+      </button>
+      <button id="cartToggle" class="absolute top-3 left-21 bg-yellow-400 text-gray-900 p-2 rounded-full hover:bg-yellow-500">
+        <i class="fas fa-shopping-cart"></i>
+      </button>
+      <h1 class="text-5xl font-extrabold animate-cosmic-slide">ویجی‌نو: سفری به دنیای دانش</h1>
+      <nav class="mt-6">
+        <a href="#products" class="mx-4 text-base font-semibold hover:text-yellow-400 transition-colors animate-cosmic-slide">محصولات</a>
+        <a href="#compare" class="mx-4 text-base font-semibold hover:text-yellow-400 transition-colors animate-cosmic-slide">مقایسه</a>
+        <a href="#features" class="mx-4 text-base font-semibold hover:text-yellow-400 transition-colors animate-cosmic-slide">ویژگی‌ها</a>
+        <a href="#about" class="mx-4 text-base font-semibold hover:text-yellow-400 transition-colors animate-cosmic-slide">درباره ما</a>
+        <a href="#contact" class="mx-4 text-base font-semibold hover:text-yellow-400 transition-colors animate-cosmic-slide">تماس با ما</a>
+      </nav>
+      <p class="mt-4 text-sm animate-cosmic-slide">کتاب رویاییت رو با چت‌بات ما پیدا کن و سریع سفارش بده! 📚✨</p>
+      <div class="mt-5 max-w-sm mx-auto flex items-center space-x-2">
+        <input type="text" id="search" placeholder="جستجوی کتاب..." class="search-bar w-full p-2 rounded-full text-right text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+        <i class="fas fa-search text-base text-gray-600"></i>
+      </div>
+      <div class="mt-2 max-w-sm mx-auto flex items-center justify-center space-x-2">
+        <label for="price-range" class="text-sm font-semibold">محدوده قیمت:</label>
+        <input type="range" id="price-range" min="0" max="600000" value="600000" class="w-3/5 h-1 bg-red-200 rounded-lg appearance-none cursor-pointer">
+        <span id="price-value" class="text-sm font-semibold">۶۰۰٬۰۰۰ تومان</span>
+      </div>
+      <div class="mt-2 max-w-sm mx-auto flex items-center justify-center space-x-2">
+        <label for="category-filter" class="text-sm font-semibold">دسته‌بندی:</label>
+        <select id="category-filter" class="category-filter w-3/5 p-1 rounded-full text-right text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <option value="all">همه دسته‌ها</option>
+          <option value="روانشناسی">روانشناسی</option>
+          <option value="انگیزشی">انگیزشی</option>
+          <option value="علمی">علمی</option>
+        </select>
+      </div>
+      <div class="mt-2 max-w-sm mx-auto flex items-center justify-center space-x-2">
+        <label for="sort-filter" class="text-sm font-semibold">مرتب‌سازی:</label>
+        <select id="sort-filter" class="sort-filter w-3/5 p-1 rounded-full text-right text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <option value="default">پیش‌فرض</option>
+          <option value="price-asc">قیمت: کم به زیاد</option>
+          <option value="price-desc">قیمت: زیاد به کم</option>
+          <option value="rating-desc">امتیاز: زیاد به کم</option>
+        </select>
+      </div>
+      <div class="mt-2 max-w-sm mx-auto">
+        <button id="aiSuggest" class="bg-purple-600 text-white py-1 px-5 rounded-full hover:bg-purple-700 btn-cosmic">پیشنهاد هوشمند کتاب</button>
+      </div>
+    </div>
+  </header>
+
+  <section id="slider" class="py-8 bg-white">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold text-center mb-6 animate-cosmic-slide text-gray-900">محصولات ویژه</h2>
+      <div class="slider-container relative">
+        <div class="slider" id="slider">
+          <div class="slider-item active">
+            <img src="https://via.placeholder.com/450x225" alt="کتاب روانشناسی تاریک" class="mx-auto rounded-lg">
+            <h3 class="text-base font-bold mt-2">کتاب روانشناسی تاریک</h3>
+            <p class="text-sm text-gray-600 mt-1">۴۵۰٬۰۰۰ تومان</p>
+            <div class="rating" data-product="کتاب روانشناسی تاریک">
+              <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+            </div>
+            <button onclick="addToCart('کتاب روانشناسی تاریک', 450000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+            <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+            <button onclick="addToCompare('کتاب روانشناسی تاریک', 450000, 'روانشناسی', 25, 'تاریک، رفتار، ذهن')" class="mt-2 compare-button">اضافه به مقایسه</button>
+          </div>
+          <div class="slider-item">
+            <img src="https://via.placeholder.com/450x225" alt="کتاب سیگنال 100" class="mx-auto rounded-lg">
+            <h3 class="text-base font-bold mt-2">کتاب سیگنال 100</h3>
+            <p class="text-sm text-gray-600 mt-1">۳۸۰٬۰۰۰ تومان</p>
+            <div class="rating" data-product="کتاب سیگنال 100">
+              <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+            </div>
+            <button onclick="addToCart('کتاب سیگنال 100', 380000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+            <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+            <button onclick="addToCompare('کتاب سیگنال 100', 380000, 'روانشناسی', 15, 'انگیزه، رفتار، ذهن')" class="mt-2 compare-button">اضافه به مقایسه</button>
+          </div>
+          <div class="slider-item">
+            <img src="https://via.placeholder.com/450x225" alt="کتاب رشادت" class="mx-auto rounded-lg">
+            <h3 class="text-base font-bold mt-2">کتاب رشادت</h3>
+            <p class="text-sm text-gray-600 mt-1">۲۵۰٬۰۰۰ تومان</p>
+            <div class="rating" data-product="کتاب رشادت">
+              <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+              <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+            </div>
+            <button onclick="addToCart('کتاب رشادت', 250000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+            <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+            <button onclick="addToCompare('کتاب رشادت', 250000, 'انگیزشی', 17, 'موفقیت، تلاش، پیشرفت')" class="mt-2 compare-button">اضافه به مقایسه</button>
+          </div>
+        </div>
+        <button class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 btn-cosmic" onclick="moveSlider(-1)">❮</button>
+        <button class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 btn-cosmic" onclick="moveSlider(1)">❯</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="products" class="py-10 bg-gradient-to-br from-white to-gray-100">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold text-center mb-6 animate-cosmic-slide text-gray-900">همه محصولات</h2>
+      <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="product bg-gradient-to-br from-white to-red-100 rounded-lg shadow-md p-5 text-center animate-cosmic-slide" data-price="450000" data-category="روانشناسی" data-rating="0">
+          <img src="https://via.placeholder.com/250" alt="کتاب روانشناسی تاریک" class="mx-auto mb-2 rounded-lg">
+          <h3 class="text-base font-bold text-gray-900">کتاب روانشناسی تاریک</h3>
+          <p class="text-green-600 font-bold text-sm mt-1">۴۵۰٬۰۰۰ تومان <del class="text-gray-400">۶۰۰٬۰۰۰ تومان</del></p>
+          <div class="rating" data-product="کتاب روانشناسی تاریک">
+            <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+          </div>
+          <button onclick="addToCart('کتاب روانشناسی تاریک', 450000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+          <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+          <button onclick="addToCompare('کتاب روانشناسی تاریک', 450000, 'روانشناسی', 25, 'تاریک، رفتار، ذهن')" class="mt-2 compare-button">اضافه به مقایسه</button>
+        </div>
+        <div class="product bg-gradient-to-br from-white to-red-100 rounded-lg shadow-md p-5 text-center animate-cosmic-slide" data-price="380000" data-category="روانشناسی" data-rating="0">
+          <img src="https://via.placeholder.com/250" alt="کتاب سیگنال 100" class="mx-auto mb-2 rounded-lg">
+          <h3 class="text-base font-bold text-gray-900">کتاب سیگنال 100</h3>
+          <p class="text-green-600 font-bold text-sm mt-1">۳۸۰٬۰۰۰ تومان <del class="text-gray-400">۴۵۰٬۰۰۰ تومان</del></p>
+          <div class="rating" data-product="کتاب سیگنال 100">
+            <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+          </div>
+          <button onclick="addToCart('کتاب سیگنال 100', 380000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+          <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+          <button onclick="addToCompare('کتاب سیگنال 100', 380000, 'روانشناسی', 15, 'انگیزه، رفتار، ذهن')" class="mt-2 compare-button">اضافه به مقایسه</button>
+        </div>
+        <div class="product bg-gradient-to-br from-white to-red-100 rounded-lg shadow-md p-5 text-center animate-cosmic-slide" data-price="250000" data-category="انگیزشی" data-rating="0">
+          <img src="https://via.placeholder.com/250" alt="کتاب رشادت" class="mx-auto mb-2 rounded-lg">
+          <h3 class="text-base font-bold text-gray-900">کتاب رشادت</h3>
+          <p class="text-green-600 font-bold text-sm mt-1">۲۵۰٬۰۰۰ تومان <del class="text-gray-400">۳۰۰٬۰۰۰ تومان</del></p>
+          <div class="rating" data-product="کتاب رشادت">
+            <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+          </div>
+          <button onclick="addToCart('کتاب رشادت', 250000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+          <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+          <button onclick="addToCompare('کتاب رشادت', 250000, 'انگیزشی', 17, 'موفقیت، تلاش، پیشرفت')" class="mt-2 compare-button">اضافه به مقایسه</button>
+        </div>
+        <div class="product bg-gradient-to-br from-white to-red-100 rounded-lg shadow-md p-5 text-center animate-cosmic-slide" data-price="400000" data-category="علمی" data-rating="0">
+          <img src="https://via.placeholder.com/250" alt="کتاب علوم" class="mx-auto mb-2 rounded-lg">
+          <h3 class="text-base font-bold text-gray-900">کتاب علوم</h3>
+          <p class="text-green-600 font-bold text-sm mt-1">۴۰۰٬۰۰۰ تومان <del class="text-gray-400">۴۵۰٬۰۰۰ تومان</del></p>
+          <div class="rating" data-product="کتاب علوم">
+            <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+          </div>
+          <button onclick="addToCart('کتاب علوم', 400000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+          <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+          <button onclick="addToCompare('کتاب علوم', 400000, 'علمی', 11, 'دانش، تحقیق، فناوری')" class="mt-2 compare-button">اضافه به مقایسه</button>
+        </div>
+        <div class="product bg-gradient-to-br from-white to-red-100 rounded-lg shadow-md p-5 text-center animate-cosmic-slide" data-price="150000" data-category="علمی" data-rating="0">
+          <img src="https://via.placeholder.com/250" alt="کتاب ریاضی هشتم" class="mx-auto mb-2 rounded-lg">
+          <h3 class="text-base font-bold text-gray-900">کتاب ریاضی هشتم</h3>
+          <p class="text-green-600 font-bold text-sm mt-1">۱۵۰٬۰۰۰ تومان <del class="text-gray-400">۲۰۰٬۰۰۰ تومان</del></p>
+          <div class="rating" data-product="کتاب ریاضی هشتم">
+            <i class="far fa-star" onclick="rateProduct(this, 1)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 2)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 3)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 4)"></i>
+            <i class="far fa-star" onclick="rateProduct(this, 5)"></i>
+          </div>
+          <button onclick="addToCart('کتاب ریاضی هشتم', 150000)" class="mt-2 bg-blue-600 text-white py-1 px-4 rounded-full hover:bg-blue-700 btn-cosmic">افزودن به سبد</button>
+          <a href="https://wa.me/09963495272" class="mt-2 inline-block bg-red-600 text-white py-1 px-4 rounded-full hover:bg-red-700 btn-cosmic">سفارش از واتساپ</a>
+          <button onclick="addToCompare('کتاب ریاضی هشتم', 150000, 'علمی', 20, 'ریاضی، آموزش، مدرسه')" class="mt-2 compare-button">اضافه به مقایسه</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare" class="py-10 bg-gray-50 hidden">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold text-center mb-6 animate-cosmic-slide text-gray-900">مقایسه محصولات</h2>
+      <div class="compare-table" id="compareTable"></div>
+      <button onclick="clearCompare()" class="mt-4 bg-red-600 text-white py-1 px-5 rounded-full hover:bg-red-700 btn-cosmic mx-auto block">پاک کردن مقایسه</button>
+    </div>
+  </section>
+
+  <section id="features" class="py-10 bg-gray-50">
+    <div class="container mx-auto">
+      <h2 class="text-2xl font-bold text-center mb-6 animate-cosmic-slide text-gray-900">ویژگی‌های ما</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-robot text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">چت‌بات هوشمند</h3>
+          <p class="text-gray-600 text-sm mt-1">چت‌بات ما با تحلیل پیشرفته، کتاب مناسب رو با توجه به ژانر، قیمت و موضوع پیشنهاد می‌ده.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-shopping-cart text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">سبد خرید حرفه‌ای</h3>
+          <p class="text-gray-600 text-sm mt-1">سبد خرید با پیش‌نمایش زنده، محاسبه تخفیف و امکان سفارش سریع از واتساپ.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-list text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">دسته‌بندی پیشرفته</h3>
+          <p class="text-gray-600 text-sm mt-1">کتاب‌ها تو دسته‌های روانشناسی، انگیزشی، علمی و مدیریتی با فیلترهای دقیق.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-cogs text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">پنل مدیریت آسان</h3>
+          <p class="text-gray-600 text-sm mt-1">مدیریت محصولات، تخفیف‌ها و دسته‌بندی‌ها با رابط کاربری ساده.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-shield-alt text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">درگاه پرداخت امن</h3>
+          <p class="text-gray-600 text-sm mt-1">به‌زودی پرداخت آنلاین با درگاه‌های معتبر و امنیت بالا.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-star text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">مقایسه پیشرفته</h3>
+          <p class="text-gray-600 text-sm mt-1">مقایسه کتاب‌ها بر اساس ژانر، قیمت، تخفیف، امتیاز و موضوعات کلیدی.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-headset text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">پشتیبانی ۲۴ ساعته</h3>
+          <p class="text-gray-600 text-sm mt-1">تیم پشتیبانی ما تو واتساپ همیشه آماده پاسخگویی به شماست.</p>
+        </div>
+        <div class="p-4 bg-white rounded-lg shadow-md animate-cosmic-slide">
+          <i class="fas fa-tags text-xl text-red-600 mb-2"></i>
+          <h3 class="text-base font-bold text-gray-900">تخفیف‌های ویژه</h3>
+          <p class="text-gray-600 text-sm mt-1">تخفیف‌های دوره‌ای و پیشنهادات ویژه برای خریدهای اقتصادی.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="py-10 bg-white">
+    <div class="container mx-auto text-center">
+      <h2 class="text-2xl font-bold mb-6 animate-cosmic-slide text-gray-900">درباره ما</h2>
+      <p class="text-sm max-w-md mx-auto text-gray-600 animate-cosmic-slide">ویجی‌نو با عشق به کتاب‌های روانشناسی، انگیزشی و علمی ساخته شده. هدف ما اینه که بهترین تجربه خرید کتاب رو با چت‌بات هوشمند و مقایسه پیشرفته براتون فراهم کنیم.</p>
+    </div>
+  </section>
+
+  <section id="contact" class="py-10 bg-gray-50">
+    <div class="container mx-auto text-center">
+      <h2 class="text-2xl font-bold mb-6 animate-cosmic-slide text-gray-900">تماس با ما</h2>
+      <p class="text-sm text-gray-600 animate-cosmic-slide">برای پشتیبانی، با شماره <a href="https://wa.me/09963495272" class="text-red-600 hover:text-red-800">۰۹۹۶۳۴۹۵۲۷۲</a> تو واتساپ پیام بده یا به ایمیل <a href="mailto:a3595076@gmail.com" class="text-red-600 hover:text-red-800">a3595076@gmail.com</a> بنویس.</p>
+    </div>
+  </section>
+
+  <footer class="footer-bg text-white py-6">
+    <div class="container mx-auto text-center">
+      <p class="text-sm animate-cosmic-slide">طراحی شده با ❤️ توسط ویجی‌نو | تمامی حقوق محفوظ است</p>
+    </div>
+  </footer>
+
+  <script>
+    // Hide loading screen
+    window.addEventListener('load', () => {
+      const loadingScreen = document.getElementById('loadingScreen');
+      setTimeout(() => {
+        loadingScreen.classList.add('hidden');
+      }, 1200);
+    });
+
+    // Welcome popup
+    function closePopup() {
+      document.getElementById('welcomePopup').classList.add('hidden');
+    }
+    setTimeout(() => {
+      document.getElementById('welcomePopup').classList.remove('hidden');
+    }, 1500);
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      themeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    // Language toggle
+    const langToggle = document.getElementById('langToggle');
+    const translations = {
+      fa: {
+        title: 'ویجی‌نو: سفری به دنیای دانش',
+        searchPlaceholder: 'جستجوی کتاب...',
+        priceLabel: 'محدوده قیمت:',
+        categoryLabel: 'دسته‌بندی:',
+        sortLabel: 'مرتب‌سازی:',
+        aiSuggest: 'پیشنهاد هوشمند کتاب',
+        products: 'محصولات',
+        compare: 'مقایسه',
+        features: 'ویژگی‌ها',
+        about: 'درباره ما',
+        contact: 'تماس با ما',
+        popupTitle: 'خوش اومدی به ویجی‌نو! 🎉',
+        popupText: 'بهترین کتاب‌های روانشناسی و علمی رو با تخفیفای خفن کشف کن!',
+        popupButton: 'شروع خرید!',
+        cartTitle: 'سبد خرید',
+        cartClose: 'بستن',
+        cartOrder: 'سفارش از واتساپ',
+        chatbotTitle: 'چت‌بات ویجی‌نو 🚀',
+        chatbotPlaceholder: 'پیامت رو بنویس...',
+        chatbotSend: 'ارسال',
+        compareTitle: 'مقایسه محصولات',
+        compareClear: 'پاک کردن مقایسه',
+        footer: 'طراحی شده با ❤️ توسط ویجی‌نو | تمامی حقوق محفوظ است'
+      },
+      en: {
+        title: 'Vijino: A Journey to Knowledge',
+        searchPlaceholder: 'Search for books...',
+        priceLabel: 'Price Range:',
+        categoryLabel: 'Category:',
+        sortLabel: 'Sort By:',
+        aiSuggest: 'Smart Book Suggestion',
+        products: 'Products',
+        compare: 'Compare',
+        features: 'Features',
+        about: 'About Us',
+        contact: 'Contact Us',
+        popupTitle: 'Welcome to Vijino! 🎉',
+        popupText: 'Discover the best psychology and science books with awesome discounts!',
+        popupButton: 'Start Shopping!',
+        cartTitle: 'Shopping Cart',
+        cartClose: 'Close',
+        cartOrder: 'Order via WhatsApp',
+        chatbotTitle: 'Vijino Chatbot 🚀',
+        chatbotPlaceholder: 'Type your message...',
+        chatbotSend: 'Send',
+        compareTitle: 'Compare Products',
+        compareClear: 'Clear Comparison',
+        footer: 'Designed with ❤️ by Vijino | All rights reserved'
+      }
+    };
+    let currentLang = 'fa';
+    langToggle.addEventListener('click', () => {
+      currentLang = currentLang === 'fa' ? 'en' : 'fa';
+      document.querySelector('h1').textContent = translations[currentLang].title;
+      document.getElementById('search').placeholder = translations[currentLang].searchPlaceholder;
+      document.querySelector('label[for="price-range"]').textContent = translations[currentLang].priceLabel;
+      document.querySelector('label[for="category-filter"]').textContent = translations[currentLang].categoryLabel;
+      document.querySelector('label[for="sort-filter"]').textContent = translations[currentLang].sortLabel;
+      document.getElementById('aiSuggest').textContent = translations[currentLang].aiSuggest;
+      document.querySelectorAll('nav a')[0].textContent = translations[currentLang].products;
+      document.querySelectorAll('nav a')[1].textContent = translations[currentLang].compare;
+      document.querySelectorAll('nav a')[2].textContent = translations[currentLang].features;
+      document.querySelectorAll('nav a')[3].textContent = translations[currentLang].about;
+      document.querySelectorAll('nav a')[4].textContent = translations[currentLang].contact;
+      document.querySelector('#welcomePopup h2').textContent = translations[currentLang].popupTitle;
+      document.querySelector('#welcomePopup p').textContent = translations[currentLang].popupText;
+      document.querySelector('#welcomePopup button').textContent = translations[currentLang].popupButton;
+      document.querySelector('#cartPopup h3').textContent = translations[currentLang].cartTitle;
+      document.querySelector('#cartPopup button').textContent = translations[currentLang].cartClose;
+      document.querySelector('#cartPopup a').textContent = translations[currentLang].cartOrder;
+      document.querySelector('#chatbot h3').textContent = translations[currentLang].chatbotTitle;
+      document.getElementById('chatbotInput').placeholder = translations[currentLang].chatbotPlaceholder;
+      document.querySelector('#chatbot button').textContent = translations[currentLang].chatbotSend;
+      document.querySelector('#compare h2').textContent = translations[currentLang].compareTitle;
+      document.querySelector('#compare button').textContent = translations[currentLang].compareClear;
+      document.querySelector('footer p').textContent = translations[currentLang].footer;
+      langToggle.innerHTML = currentLang === 'fa' ? '<i class="fas fa-globe"></i> EN' : '<i class="fas fa-globe"></i> FA';
+    });
+
+    // Cart functionality
+    let cart = [];
+    function addToCart(title, price) {
+      cart.push({ title, price });
+      updateCart();
+    }
+    function updateCart() {
+      const cartItems = document.getElementById('cartItems');
+      const cartTotal = document.getElementById('cartTotal');
+      cartItems.innerHTML = cart.map(item => `<p>${item.title}: ${item.price.toLocaleString('fa-IR')} تومان</p>`).join('');
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      cartTotal.textContent = total.toLocaleString('fa-IR');
+      document.getElementById('cartPopup').style.display = 'block';
+    }
+    function closeCart() {
+      document.getElementById('cartPopup').style.display = 'none';
+    }
+    document.getElementById('cartToggle').addEventListener('click', () => {
+      document.getElementById('cartPopup').style.display = 'block';
+    });
+
+    // Compare functionality
+    let compareList = [];
+    function addToCompare(title, price, category, discount, topics) {
+      if (compareList.length >= 3) {
+        alert(currentLang === 'fa' ? 'حداکثر ۳ کتاب برای مقایسه می‌تونی انتخاب کنی!' : 'You can select up to 3 books for comparison!');
+        return;
+      }
+      if (!compareList.some(item => item.title === title)) {
+        compareList.push({ title, price, category, discount, topics, rating: 0 });
+        updateCompareTable();
+        document.getElementById('compare').classList.remove('hidden');
+      }
+    }
+    function updateCompareTable() {
+      const compareTable = document.getElementById('compareTable');
+      compareTable.innerHTML = `
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 bg-gray-100 p-4 rounded-lg dark:bg-gray-800">
+          <div class="font-bold text-sm">عنوان</div>
+          ${compareList.map(item => `<div class="text-sm">${item.title}</div>`).join('')}
+          <div class="font-bold text-sm">ژانر</div>
+          ${compareList.map(item => `<div class="text-sm">${item.category}</div>`).join('')}
+          <div class="font-bold text-sm">قیمت</div>
+          ${compareList.map(item => `<div class="text-sm">${item.price.toLocaleString('fa-IR')} تومان</div>`).join('')}
+          <div class="font-bold text-sm">تخفیف</div>
+          ${compareList.map(item => `<div class="text-sm">${item.discount}%</div>`).join('')}
+          <div class="font-bold text-sm">موضوعات</div>
+          ${compareList.map(item => `<div class="text-sm">${item.topics}</div>`).join('')}
+          <div class="font-bold text-sm">امتیاز</div>
+          ${compareList.map(item => `<div class="text-sm">${item.rating}/5</div>`).join('')}
+          <div class="font-bold text-sm">عملیات</div>
+          ${compareList.map(item => `
+            <div>
+              <button onclick="removeFromCompare('${item.title}')" class="bg-red-600 text-white py-1 px-3 rounded-full hover:bg-red-700 btn-cosmic text-xs">حذف</button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    function removeFromCompare(title) {
+      compareList = compareList.filter(item => item.title !== title);
+      updateCompareTable();
+      if (compareList.length === 0) {
+        document.getElementById('compare').classList.add('hidden');
+      }
+    }
+    function clearCompare() {
+      compareList = [];
+      updateCompareTable();
+      document.getElementById('compare').classList.add('hidden');
+    }
+
+    // Chatbot functionality
+    const books = [
+      { title: 'کتاب روانشناسی تاریک', category: 'روانشناسی', price: 450000, discount: 25, topics: 'تاریک، رفتار، ذهن', keywords: ['روانشناسی', 'تاریک', 'رفتار', 'ذهن', 'انسان', 'psychology', 'dark', 'behavior'] },
+      { title: 'کتاب سیگنال 100', category: 'روانشناسی', price: 380000, discount: 15, topics: 'انگیزه، رفتار، ذهن', keywords: ['روانشناسی', 'سیگنال', 'انگیزه', 'رفتار', 'ذهن', 'psychology', 'signal', 'motivation'] },
+      { title: 'کتاب رشادت', category: 'انگیزشی', price: 250000, discount: 17, topics: 'موفقیت، تلاش، پیشرفت', keywords: ['انگیزشی', 'رشادت', 'موفقیت', 'تلاش', 'پیشرفت', 'motivation', 'success', 'effort'] },
+      { title: 'کتاب علوم', category: 'علمی', price: 400000, discount: 11, topics: 'دانش، تحقیق، فناوری', keywords: ['علمی', 'علوم', 'دانش', 'تحقیق', 'فناوری', 'science', 'knowledge', 'research'] },
+      { title: 'کتاب ریاضی هشتم', category: 'علمی', price: 150000, discount: 20, topics: 'ریاضی، آموزش، مدرسه', keywords: ['علمی', 'ریاضی', 'هشتم', 'آموزش', 'مدرسه', 'math', 'eighth', 'education'] }
+    ];
+    function toggleChatbot() {
+      const chatbot = document.getElementById('chatbot');
+      chatbot.classList.toggle('hidden');
+    }
+    function sendChatbotMessage() {
+      const input = document.getElementById('chatbotInput');
+      const message = input.value.trim().toLowerCase();
+      const chatbotMessages = document.getElementById('chatbotMessages');
+      if (message) {
+        // Add user message
+        const userMessage = document.createElement('div');
+        userMessage.className = 'chatbot-message user';
+        userMessage.textContent = message;
+        chatbotMessages.appendChild(userMessage);
+
+        // Process message
+        let response = '';
+        let suggestedBooks = [];
+
+        // Check for category
+        if (message.includes('روانشناسی') || message.includes('psychology') || message.includes('ذهن') || message.includes('رفتار')) {
+          suggestedBooks = books.filter(book => book.category === 'روانشناسی');
+        } else if (message.includes('انگیزشی') || message.includes('motivation') || message.includes('موفقیت') || message.includes('تلاش')) {
+          suggestedBooks = books.filter(book => book.category === 'انگیزشی');
+        } else if (message.includes('علمی') || message.includes('science') || message.includes('ریاضی') || message.includes('دانش') || message.includes('آموزش')) {
+          suggestedBooks = books.filter(book => book.category === 'علمی');
+        }
+
+        // Check for price range
+        if (message.includes('ارزان') || message.includes('cheap') || message.includes('کم قیمت')) {
+          suggestedBooks = books.filter(book => book.price <= 250000);
+        } else if (message.includes('گران') || message.includes('expensive') || message.includes('بالا')) {
+          suggestedBooks = books.filter(book => book.price >= 400000);
+        }
+
+        // Check for specific keywords
+        if (suggestedBooks.length === 0) {
+          suggestedBooks = books.filter(book => book.keywords.some(keyword => message.includes(keyword)));
+        }
+
+        // Generate response
+        if (suggestedBooks.length > 0) {
+          const suggestedBook = suggestedBooks[Math.floor(Math.random() * suggestedBooks.length)];
+          response = currentLang === 'fa'
+            ? `پیشنهاد من: "${suggestedBook.title}" (${suggestedBook.category} - ${suggestedBook.price.toLocaleString('fa-IR')} تومان، ${suggestedBook.discount}% تخفیف، موضوعات: ${suggestedBook.topics}). می‌خوای به سبد یا مقایسه اضافه‌ش کنم؟`
+            : `I suggest: "${suggestedBook.title}" (${suggestedBook.category} - ${suggestedBook.price.toLocaleString()} IRR, ${suggestedBook.discount}% off, Topics: ${suggestedBook.topics}). Want to add it to cart or compare?`;
+          const addCartButton = document.createElement('button');
+          addCartButton.className = 'bg-blue-600 text-white py-1 px-3 rounded-full hover:bg-blue-700 btn-cosmic mt-1 mr-1';
+          addCartButton.textContent = currentLang === 'fa' ? 'اضافه به سبد' : 'Add to Cart';
+          addCartButton.onclick = () => {
+            addToCart(suggestedBook.title, suggestedBook.price);
+            const confirmMessage = document.createElement('div');
+            confirmMessage.className = 'chatbot-message';
+            confirmMessage.textContent = currentLang === 'fa' ? `${suggestedBook.title} به سبد اضافه شد!` : `${suggestedBook.title} added to cart!`;
+            chatbotMessages.appendChild(confirmMessage);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+          };
+          const addCompareButton = document.createElement('button');
+          addCompareButton.className = 'bg-purple-600 text-white py-1 px-3 rounded-full hover:bg-purple-700 btn-cosmic mt-1';
+          addCompareButton.textContent = currentLang === 'fa' ? 'اضافه به مقایسه' : 'Add to Compare';
+          addCompareButton.onclick = () => {
+            addToCompare(suggestedBook.title, suggestedBook.price, suggestedBook.category, suggestedBook.discount, suggestedBook.topics);
+            const confirmMessage = document.createElement('div');
+            confirmMessage.className = 'chatbot-message';
+            confirmMessage.textContent = currentLang === 'fa' ? `${suggestedBook.title} به مقایسه اضافه شد!` : `${suggestedBook.title} added to comparison!`;
+            chatbotMessages.appendChild(confirmMessage);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+          };
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'chatbot-message';
+          responseDiv.textContent = response;
+          responseDiv.appendChild(addCartButton);
+          responseDiv.appendChild(addCompareButton);
+          chatbotMessages.appendChild(responseDiv);
+        } else {
+          response = currentLang === 'fa'
+            ? 'چیزی پیدا نکردم! لطفاً ژانر (مثل روانشناسی)، قیمت (ارزان یا گرون)، یا موضوع خاص (مثل رفتار، موفقیت) بگو.'
+            : 'I couldn’t find anything! Please specify a genre (like psychology), price (cheap or expensive), or topic (like behavior, success).';
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'chatbot-message';
+          responseDiv.textContent = response;
+          chatbotMessages.appendChild(responseDiv);
+        }
+
+        input.value = '';
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+      }
+    }
+
+    // Rating system
+    function rateProduct(star, rating) {
+      const ratingContainer = star.parentElement;
+      const product = ratingContainer.getAttribute('data-product');
+      const stars = ratingContainer.querySelectorAll('i');
+      stars.forEach((s, i) => {
+        s.className = i < rating ? 'fas fa-star' : 'far fa-star';
+      });
+      document.querySelectorAll(`.product[data-product="${product}"]`).forEach(p => p.setAttribute('data-rating', rating));
+      compareList.forEach(item => {
+        if (item.title === product) item.rating = rating;
+      });
+      updateCompareTable();
+      filterAndSortProducts();
+    }
+
+    // AI book suggestion
+    document.getElementById('aiSuggest').addEventListener('click', () => {
+      const randomBook = books[Math.floor(Math.random() * books.length)];
+      alert(currentLang === 'fa'
+        ? `پیشنهاد هوشمند: ${randomBook.title} (${randomBook.category} - ${randomBook.price.toLocaleString('fa-IR')} تومان، ${randomBook.discount}% تخفیف)`
+        : `Smart Suggestion: ${randomBook.title} (${randomBook.category} - ${randomBook.price.toLocaleString()} IRR, ${randomBook.discount}% off)`);
+    });
+
+    // Slider functionality
+    let currentSlide = 0;
+    const slider = document.getElementById('slider');
+    const slides = slider.children;
+    function moveSlider(direction) {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + direction + slides.length) % slides.length;
+      slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+      slides[currentSlide].classList.add('active');
+    }
+    setInterval(() => moveSlider(1), 5000);
+
+    // Search, category, and sort functionality
+    const searchInput = document.getElementById('search');
+    const productList = document.getElementById('product-list');
+    const products = Array.from(productList.getElementsByClassName('product'));
+    const priceRange = document.getElementById('price-range');
+    const priceValue = document.getElementById('price-value');
+    const categoryFilter = document.getElementById('category-filter');
+    const sortFilter = document.getElementById('sort-filter');
+
+    function filterAndSortProducts() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const selectedCategory = categoryFilter.value;
+      const maxPrice = parseInt(priceRange.value);
+      const sortOption = sortFilter.value;
+
+      let filteredProducts = products.filter(product => {
+        const title = product.querySelector('h3').textContent.toLowerCase();
+        const category = product.getAttribute('data-category');
+        const price = parseInt(product.getAttribute('data-price'));
+        const matchesSearch = title.includes(searchTerm);
+        const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+        const matchesPrice = price <= maxPrice;
+        return matchesSearch && matchesCategory && matchesPrice;
+      });
+
+      if (sortOption === 'price-asc') {
+        filteredProducts.sort((a, b) => parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price')));
+      } else if (sortOption === 'price-desc') {
+        filteredProducts.sort((a, b) => parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price')));
+      } else if (sortOption === 'rating-desc') {
+        filteredProducts.sort((a, b) => parseInt(b.getAttribute('data-rating')) - parseInt(a.getAttribute('data-rating')));
+      }
+
+      productList.innerHTML = '';
+      filteredProducts.forEach(product => productList.appendChild(product));
+      products.forEach(product => {
+        if (!filteredProducts.includes(product)) {
+          product.style.display = 'none';
+        } else {
+          product.style.display = '';
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', filterAndSortProducts);
+    priceRange.addEventListener('input', () => {
+      const maxPrice = parseInt(priceRange.value);
+      priceValue.textContent = `${maxPrice.toLocaleString('fa-IR')} تومان`;
+      filterAndSortProducts();
+    });
+    categoryFilter.addEventListener('change', filterAndSortProducts);
+    sortFilter.addEventListener('change', filterAndSortProducts);
+
+    // Scroll-triggered animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-cosmic-slide');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-cosmic-slide').forEach(element => {
+      observer.observe(element);
+    });
+  </script>
+</body>
+</html>
